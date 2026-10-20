@@ -3,14 +3,18 @@ import java.util.ArrayList;
 
 public class Vehicle {
     private String size;
-    private final String licencePlate;
+    private String licencePlate;
     private ArrayList<String> licencePlateStorage = new ArrayList();
     private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final Random RANDOM = new Random();
+    private boolean ev;
+    private String priority;
 
-    public Vehicle(String size) {
+    public Vehicle(String size, boolean ev, String priority) {
         this.licencePlate = generatePlate();
         this.size = size;
+        this.ev = ev;
+        this.priority = priority;
     }
 
     public static String randomPlate() {
