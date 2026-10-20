@@ -1,3 +1,5 @@
+package Parking.Vehicles;
+
 public class Motorcycle extends Vehicle{
 
 

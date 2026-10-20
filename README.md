@@ -8,13 +8,13 @@ First Class is a Java Compact file that will create all of the necessary data po
 
 | File | Description |
 |------|-------------|
-| `Vehicle.java` | Base class that holds the shared data and the licence plate logic for every vehicle. |
-| `Car.java` | Subclass of `Vehicle` with size `"M"` (medium). |
+| `Parking.Vehicles.Vehicle` | Base class that holds the shared data and the licence plate logic for every vehicle. |
+| `Parking.Vehicles.Car` | Subclass of `Vehicle` with size `"M"` (medium). |
 | `Motorcylce.java` | Subclass of `Vehicle` with size `"S"` (small). |
-| `Truck.java` | Subclass of `Vehicle` with size `"L"` (large). |
-| `ParkingDataCreator.java` | Entry point (`main`). Loops 100 times to create vehicle data. |
+| `Parking.Vehicles.Truck` | Subclass of `Vehicle` with size `"L"` (large). |
+| `Parking.data.ParkingDataCreator` | Entry point (`main`). Loops 100 times to create vehicle data. |
 
-## Vehicle Class
+## Parking.Vehicles.Vehicle Class
 
 The parent class that every vehicle type extends.
 
@@ -22,7 +22,7 @@ The parent class that every vehicle type extends.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `size` | `String` | Vehicle size: `"S"`, `"M"` or `"L"`. Set by the subclass. |
+| `size` | `String` | Parking.Vehicles.Vehicle size: `"S"`, `"M"` or `"L"`. Set by the subclass. |
 | `licencePlate` | `String` | A 6-character plate generated when the vehicle is created. |
 | `licencePlateStorage` | `ArrayList<String>` | The list of plates that have already been used. |
 | `ev` | `boolean` | `true` if the vehicle is electric. |
@@ -33,7 +33,7 @@ The parent class that every vehicle type extends.
 ### Constructor
 
 ```java
-public Vehicle(String size, boolean ev, String priority)
+public Parking.Vehicles.Vehicle(String size, boolean ev, String priority)
 ```
 
 The constructor generates a licence plate automatically and stores the size, EV status and priority.
@@ -51,9 +51,9 @@ The constructor generates a licence plate automatically and stores the size, EV 
 Each subclass passes its own fixed size to `Vehicle` through `super(...)`. The caller only supplies the EV status and the priority.
 
 ```java
-new Car(true, "high");        // size "M"
+new Parking.Vehicles.Car(true, "high");        // size "M"
 new Motorcylce(false, "low"); // size "S"
-new Truck(false, "normal");   // size "L"
+new Parking.Vehicles.Truck(false, "normal");   // size "L"
 ```
 
 Because `licencePlate` is `private`, subclasses read it through `getLicencePlate()` rather than accessing the field directly.
@@ -70,7 +70,7 @@ With 36 possible characters in 6 positions, there are over 2 billion possible pl
 
 ```bash
 javac *.java
-java ParkingDataCreator
+java Parking.data.ParkingDataCreator
 ```
 
 `ParkingDataCreator` currently contains an empty loop that runs 100 times, intended for creating vehicles.

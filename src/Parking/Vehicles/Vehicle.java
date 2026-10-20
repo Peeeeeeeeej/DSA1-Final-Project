@@ -1,3 +1,5 @@
+package Parking.Vehicles;
+
 import java.util.Random;
 import java.util.ArrayList;
 
