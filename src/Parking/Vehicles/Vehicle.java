@@ -10,13 +10,15 @@ public class Vehicle {
     private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final Random RANDOM = new Random();
     private boolean ev;
-    private String priority;
+    private String designation;
+    private boolean isHandicapped;
 
-    public Vehicle(String size, boolean ev, String priority) {
+    public Vehicle(String size, boolean ev, String designation, boolean isHandicapped) {
         this.licencePlate = generatePlate();
         this.size = size;
         this.ev = ev;
-        this.priority = priority;
+        this.designation = designation;
+        this.isHandicapped = isHandicapped;
     }
 
     public static String randomPlate() {

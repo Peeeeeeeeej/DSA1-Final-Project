@@ -26,17 +26,17 @@ The parent class that every vehicle type extends.
 | `licencePlate` | `String` | A 6-character plate generated when the vehicle is created. |
 | `licencePlateStorage` | `ArrayList<String>` | The list of plates that have already been used. |
 | `ev` | `boolean` | `true` if the vehicle is electric. |
-| `priority` | `String` | The vehicle's parking priority. |
+| `designation` | `String` | The vehicle's parking designation. |
 | `CHARS` | `static final String` | The characters a plate can contain (A-Z, 0-9). |
 | `RANDOM` | `static final Random` | The random number generator used to build plates. |
 
 ### Constructor
 
 ```java
-public Parking.Vehicles.Vehicle(String size, boolean ev, String priority)
+public Parking.Vehicles.Vehicle(String size, boolean ev, String designation)
 ```
 
-The constructor generates a licence plate automatically and stores the size, EV status and priority.
+The constructor generates a licence plate automatically and stores the size, EV status and designation.
 
 ### Methods
 
@@ -48,7 +48,7 @@ The constructor generates a licence plate automatically and stores the size, EV 
 
 ## Subclasses
 
-Each subclass passes its own fixed size to `Vehicle` through `super(...)`. The caller only supplies the EV status and the priority.
+Each subclass passes its own fixed size to `Vehicle` through `super(...)`. The caller only supplies the EV status and the designation.
 
 ```java
 new Parking.Vehicles.Car(true, "high");        // size "M"
