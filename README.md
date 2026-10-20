@@ -6,59 +6,69 @@ First Class is a Java Compact file that will create all of the necessary data po
 
 ## Project Structure
 
-| File | Description |
-|------|-------------|
-| `Parking.Vehicles.Vehicle` | Base class that holds the shared data and the licence plate logic for every vehicle. |
-| `Parking.Vehicles.Car` | Subclass of `Vehicle` with size `"M"` (medium). |
-| `Motorcylce.java` | Subclass of `Vehicle` with size `"S"` (small). |
-| `Parking.Vehicles.Truck` | Subclass of `Vehicle` with size `"L"` (large). |
-| `Parking.data.ParkingDataCreator` | Entry point (`main`). Loops 100 times to create vehicle data. |
+```
+src/
+└── Parking/
+    ├── Vehicles/
+    │   ├── Vehicle.java
+    │   ├── Car.java
+    │   ├── Motorcylce.java
+    │   └── Truck.java
+    ├── Lots/
+    │   ├── ParkingLot.java
+    │   ├── ParkingSpace.java
+    │   └── ParkingRequest.java
+    └── Data/
+        └── ParkingDataCreator.java
+```
 
-## Parking.Vehicles.Vehicle Class
+| Package | Purpose |
+|---------|---------|
+| `Parking.Vehicles` | The vehicles being parked: the `Vehicle` base class and its subclasses. |
+| `Parking.Lots` | Where vehicles park: lots, spaces, and parking requests. |
+| `Parking.Data` | Generates the simulated dataset and exports it to CSV files. |
+
+## Vehicles
+
+### Vehicle
 
 The parent class that every vehicle type extends.
 
-### Fields
-
 | Field | Type | Description |
 |-------|------|-------------|
-| `size` | `String` | Parking.Vehicles.Vehicle size: `"S"`, `"M"` or `"L"`. Set by the subclass. |
-| `licencePlate` | `String` | A 6-character plate generated when the vehicle is created. |
+| `size` | `String` | Vehicle size: `"S"`, `"M"` or `"L"`. Set by the subclass. |
+| `licencePlate` | `String` | A unique 6-character plate generated when the vehicle is created. |
 | `licencePlateStorage` | `ArrayList<String>` | The list of plates that have already been used. |
 | `ev` | `boolean` | `true` if the vehicle is electric. |
-| `designation` | `String` | The vehicle's parking designation. |
+| `designation` | `String` | `"student"`, `"faculty"`, `"visitor"` or `"service"`. |
+| `isHandicapped` | `boolean` | `true` if the vehicle needs a handicapped space. |
+| `DESIGNATIONS` | `static final String[]` | The list of valid designations. |
+| `DESIGNATION_WEIGHTS` | `static final int[]` | The percentage chance of each designation. |
 | `CHARS` | `static final String` | The characters a plate can contain (A-Z, 0-9). |
-| `RANDOM` | `static final Random` | The random number generator used to build plates. |
-
-### Constructor
-
-```java
-public Parking.Vehicles.Vehicle(String size, boolean ev, String designation)
-```
-
-The constructor generates a licence plate automatically and stores the size, EV status and designation.
-
-### Methods
+| `RANDOM` | `static final Random` | The random number generator used for all random values. |
 
 | Method | Description |
 |--------|-------------|
 | `randomPlate()` | Builds a random 6-character string from `CHARS`, for example `K7Q2ZP`. |
-| `generatePlate()` | Calls `randomPlate()` repeatedly in a `do-while` loop until it gets a plate that isn't in `licencePlateStorage`, then stores that plate and returns it. |
+| `generatePlate()` | Calls `randomPlate()` in a `do-while` loop until it gets a plate that isn't in `licencePlateStorage`, then stores that plate and returns it. |
+| `randomEv()` | Returns `true` 10% of the time. |
+| `randomHandicapped()` | Returns `true` 5% of the time. |
+| `randomDesignation()` | Picks a designation using `DESIGNATION_WEIGHTS`. |
 | `getLicencePlate()` | Returns the vehicle's licence plate. Every subclass inherits this method. |
 
-## Subclasses
+### Subclasses
 
-Each subclass passes its own fixed size to `Vehicle` through `super(...)`. The caller only supplies the EV status and the designation.
+| Class | Size |
+|-------|------|
+| `Car` | `"M"` (medium) |
+| `Motorcylce` | `"S"` (small) |
+| `Truck` | `"L"` (large) |
 
-```java
-new Parking.Vehicles.Car(true, "high");        // size "M"
-new Motorcylce(false, "low"); // size "S"
-new Parking.Vehicles.Truck(false, "normal");   // size "L"
-```
+Each subclass passes its own fixed size to `Vehicle` through `super(...)`. Because the fields are `private`, subclasses read them through the inherited getters.
 
-Because `licencePlate` is `private`, subclasses read it through `getLicencePlate()` rather than accessing the field directly.
+## How Random Values Are Generated
 
-## How Licence Plates Are Generated
+### Licence Plates
 
 1. `randomPlate()` picks 6 random characters from A-Z and 0-9.
 2. `generatePlate()` checks whether that plate is already in `licencePlateStorage`.
@@ -66,11 +76,21 @@ Because `licencePlate` is `private`, subclasses read it through `getLicencePlate
 
 With 36 possible characters in 6 positions, there are over 2 billion possible plates, so a repeat is rare. The loop guarantees uniqueness for the cases where one does happen.
 
+### EV and Handicapped
+
+`RANDOM.nextInt(100)` gives a number from 0 to 99. The vehicle is EV if the number is below 10, giving a 10% chance, and handicapped if it's below 5, giving a 5% chance.
+
+### Designation
+
+| Designation | Chance |
+|-------------|--------|
+| Student | 60% |
+| Faculty | 25% |
+| Visitor | 10% |
+| Service | 5% |
+
+`randomDesignation()` rolls a number from 0 to 99 and adds up the weights in order. The first designation whose running total is higher than the roll is chosen. To change the mix, edit `DESIGNATION_WEIGHTS` and keep the total at 100.
+
 ## Running
 
-```bash
-javac *.java
-java Parking.data.ParkingDataCreator
-```
-
-`ParkingDataCreator` currently contains an empty loop that runs 100 times, intended for creating vehicles.
+Open the project in IntelliJ, open `ParkingDataCreator`, and click the green run arrow next to `main`.
