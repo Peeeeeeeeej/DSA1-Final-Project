@@ -10,7 +10,6 @@ public class Lot {
     private int nHandicapSpaces;
     private int nFacultySpaces;
     private int nServiceSpaces;
-    private int nEvSpaces;
     private int nStudentSpaces;
     private int nVisitorSpaces;
 
@@ -24,11 +23,10 @@ public class Lot {
         this.nServiceSpaces = (int) Math.floor((double) sizeInit * 0.05);
         this.nStudentSpaces = (int) Math.floor((double) sizeInit * 0.45); // was 0.60 before EV and handicap
         this.nVisitorSpaces = (int) Math.floor((double) sizeInit * 0.10);
-        this.nEvSpaces = (int) Math.floor((double) sizeInit * 0.10);
         this.nHandicapSpaces = (int) Math.floor((double) sizeInit * 0.05);
 
         // account for left-over spaces from truncation of ceiling function
-        for (int spaceIdx = 0; spaceIdx < (size-(nFacultySpaces+nServiceSpaces+nStudentSpaces+nVisitorSpaces+nHandicapSpaces+nEvSpaces)); spaceIdx++) {
+        for (int spaceIdx = 0; spaceIdx < (size-(nFacultySpaces+nServiceSpaces+nStudentSpaces+nVisitorSpaces+nHandicapSpaces)); spaceIdx++) {
             lotList.add(new Space());
         }
 
@@ -55,11 +53,6 @@ public class Lot {
         // append handicap spaces
         for (int spaceIdx=0; spaceIdx<nHandicapSpaces; spaceIdx++) {
             lotList.add(new HandicapSpace());
-        }
-        
-        // append EV spaces
-        for (int spaceIdx=0; spaceIdx<nEvSpaces; spaceIdx++) {
-            lotList.add(new EVSpace());
         }
     }
 
@@ -115,16 +108,6 @@ public class Lot {
             }
         }
         return handicapSpaces;
-    }
-
-    public ArrayList<Space> getEvSpaces() {
-        ArrayList<Space> evSpaces = new ArrayList<Space>();
-        for (int spaceIdx = 0; spaceIdx<size; spaceIdx++) {
-            if (lotList.get(spaceIdx) instanceof EVSpace) {
-                evSpaces.add(lotList.get(spaceIdx));
-            }
-        }
-        return evSpaces;
     }
 
 }
