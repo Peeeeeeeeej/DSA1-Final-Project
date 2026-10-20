@@ -34,6 +34,7 @@ public class Vehicle {
         return plate;
     }
 
-
-
+    public String getLicencePlate() {
+        return licencePlate;
+    }
 }
