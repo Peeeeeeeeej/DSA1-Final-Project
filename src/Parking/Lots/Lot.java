@@ -110,4 +110,8 @@ public class Lot {
         return handicapSpaces;
     }
 
+    public List<Space> getSpaces() {
+        return lotList;
+    }
+
 }
