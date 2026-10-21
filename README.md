@@ -7,23 +7,27 @@ First Class is a Java Compact file that will create all of the necessary data po
 ## Project Structure
 
 ```
-src/
-└── Parking/
-    ├── data/
-    │   └── ParkingDataCreator.java
-    ├── Lots/
-    │   ├── Lot.java
-    │   ├── Space.java
-    │   ├── FacultySpace.java
-    │   ├── StudentSpace.java
-    │   ├── VisitorSpace.java
-    │   ├── ServiceSpace.java
-    │   └── HandicapSpace.java
-    └── Vehicles/
-        ├── Vehicle.java
-        ├── Car.java
-        ├── Motorcycle.java
-        └── Truck.java
+DSA1-Final-Project/
+├── README.md
+├── vehicles.csv
+├── lots.csv
+└── src/
+    └── Parking/
+        ├── data/
+        │   └── ParkingDataCreator.java
+        ├── Lots/
+        │   ├── Lot.java
+        │   ├── Space.java
+        │   ├── FacultySpace.java
+        │   ├── StudentSpace.java
+        │   ├── VisitorSpace.java
+        │   ├── ServiceSpace.java
+        │   └── HandicapSpace.java
+        └── Vehicles/
+            ├── Vehicle.java
+            ├── Car.java
+            ├── Motorcycle.java
+            └── Truck.java
 ```
 
 | Package | Purpose |
@@ -31,6 +35,69 @@ src/
 | `Parking.data` | Generates the simulated dataset and exports it to CSV files. |
 | `Parking.Lots` | Where vehicles park: parking lots and the different types of spaces. |
 | `Parking.Vehicles` | The vehicles being parked: the `Vehicle` base class and its subclasses. |
+
+## Dataset
+
+The project uses a simulated dataset (Option B). Running `ParkingDataCreator` generates:
+
+| Item | Amount |
+|------|--------|
+| Vehicles | 300 |
+| Parking lots | 10 |
+| Parking spaces | 500 |
+| Designations (priorities) | Student, Faculty, Visitor, Service, plus Handicap spaces |
+
+### vehicles.csv
+
+One row per vehicle.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `vehicleId` | Number from 1 to 300 | `1` |
+| `licencePlate` | Unique 6-character plate | `F5LOMF` |
+| `type` | `Car`, `Motorcycle` or `Truck` | `Car` |
+| `size` | `S`, `M` or `L` | `M` |
+| `designation` | `student`, `faculty`, `visitor` or `service` | `student` |
+| `ev` | `true` if electric | `false` |
+| `handicapped` | `true` if the vehicle needs a handicap space | `false` |
+
+```
+vehicleId,licencePlate,type,size,designation,ev,handicapped
+1,F5LOMF,Motorcycle,S,faculty,true,false
+2,NHV44F,Car,M,student,false,true
+3,DL8CA8,Truck,L,student,false,false
+```
+
+### lots.csv
+
+One row per parking space.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `lotId` | Lot name, `Lot1` to `Lot10` | `Lot1` |
+| `lotSize` | Total number of spaces in that lot | `80` |
+| `spaceId` | Lot number plus space number | `L1-009` |
+| `spaceType` | `GeneralSpace`, `FacultySpace`, `StudentSpace`, `VisitorSpace`, `ServiceSpace` or `HandicapSpace` | `FacultySpace` |
+
+```
+lotId,lotSize,spaceId,spaceType
+Lot1,80,L1-001,GeneralSpace
+Lot1,80,L1-009,FacultySpace
+Lot1,80,L1-033,StudentSpace
+```
+
+### Current Dataset Totals
+
+| Vehicle Type | Count | | Designation | Count | | Space Type | Count |
+|--------------|-------|-|-------------|-------|-|------------|-------|
+| Car | 228 | | Student | 179 | | Student | 222 |
+| Truck | 41 | | Faculty | 77 | | Faculty | 122 |
+| Motorcycle | 31 | | Visitor | 28 | | General | 63 |
+| | | | Service | 16 | | Visitor | 49 |
+| | | | | | | Service | 22 |
+| | | | | | | Handicap | 22 |
+
+30 vehicles are EV and 17 are handicapped. These numbers change every time the program runs, since the data is random.
 
 ## Vehicles
 
@@ -109,11 +176,21 @@ Subclasses inherit all of the getters from `Vehicle`.
 
 `randomDesignation()` rolls a number from 0 to 99 and adds up the weights in order. The first designation whose running total is higher than the roll is chosen. To change the mix, edit `DESIGNATION_WEIGHTS` and keep the total at 100.
 
+### Vehicle Type
+
+`ParkingDataCreator` picks each vehicle's type:
+
+| Type | Chance |
+|------|--------|
+| Car | 75% |
+| Truck | 15% |
+| Motorcycle | 10% |
+
 ## Lots
 
 ### Space
 
-The base class for a single parking space. A plain `Space` accepts any vehicle.
+The base class for a single parking space. A plain `Space` accepts any vehicle and is labeled `GeneralSpace` in the CSV.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -163,18 +240,32 @@ Each count is rounded down with `Math.floor`. Any spaces left over, from the rem
 | Method | Description |
 |--------|-------------|
 | `getSize()` | Returns the total number of spaces in the lot. |
+| `getSpaces()` | Returns every space in the lot. |
 | `getFacultySpaces()` | Returns a list of all `FacultySpace`s in the lot. |
 | `getStudentSpaces()` | Returns a list of all `StudentSpace`s in the lot. |
 | `getVisitorSpaces()` | Returns a list of all `VisitorSpace`s in the lot. |
 | `getServiceSpaces()` | Returns a list of all `ServiceSpace`s in the lot. |
 | `getHandicapSpaces()` | Returns a list of all `HandicapSpace`s in the lot. |
 
-The getters use `instanceof` to check each space's type.
-
 ## Data
 
-`ParkingDataCreator` is the program's entry point. It currently contains a loop that runs 100 times, which will be used to generate the dataset.
+### ParkingDataCreator
+
+The program's entry point. It creates all of the vehicles and lots, then writes them to the CSV files.
+
+| Constant / Method | Description |
+|--------|-------------|
+| `NUM_VEHICLES` | Number of vehicles to create (300). |
+| `LOT_SIZES` | Size of each of the 10 lots: 80, 70, 60, 50, 50, 45, 45, 40, 30, 30 (500 total). |
+| `randomVehicle()` | Returns a random `Car`, `Truck` or `Motorcycle`. |
+| `writeVehiclesCsv()` | Writes every vehicle to `vehicles.csv`. |
+| `writeLotsCsv()` | Writes every space in every lot to `lots.csv`. |
 
 ## Running
 
-Open the project in IntelliJ, open `ParkingDataCreator`, and click the green run arrow next to `main`.
+1. Open the project in IntelliJ.
+2. Open `ParkingDataCreator` and click the green run arrow next to `main`.
+3. The console prints `Created 300 vehicles and 10 lots.`
+4. `vehicles.csv` and `lots.csv` appear in the project root folder. If they don't show up, right-click the project and choose **Reload from Disk**.
+
+Each run generates new random data and overwrites the old CSV files.
