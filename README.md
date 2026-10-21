@@ -15,9 +15,13 @@ src/
     │   ├── Motorcylce.java
     │   └── Truck.java
     ├── Lots/
-    │   ├── ParkingLot.java
-    │   ├── ParkingSpace.java
-    │   └── ParkingRequest.java
+    │   └── FacultySpace.java
+    │   └── HandicapSpace.java
+    │   └── Lot.java
+    │   └── ServiceSpace.java
+    │   └── Space.java
+    │   └── StudentSpace.java
+    │   └── VisitorSpace.java
     └── Data/
         └── ParkingDataCreator.java
 ```
@@ -25,7 +29,7 @@ src/
 | Package | Purpose |
 |---------|---------|
 | `Parking.Vehicles` | The vehicles being parked: the `Vehicle` base class and its subclasses. |
-| `Parking.Lots` | Where vehicles park: lots, spaces, and parking requests. |
+| `Parking.Lots` | Where vehicles park: lots, spaces, and space subclasses. |
 | `Parking.Data` | Generates the simulated dataset and exports it to CSV files. |
 
 ## Vehicles
