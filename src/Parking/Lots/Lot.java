@@ -128,7 +128,6 @@ public class Lot {
         return lotList;
     }
 
-<<<<<<< HEAD
     // queue-related methods
 
     public void addIncoming(Vehicle v) {
@@ -250,6 +249,4 @@ public class Lot {
         return false;
 }
 
-=======
->>>>>>> 2345680e27fab93a0ce687a196a22fb454444bb7
 }
