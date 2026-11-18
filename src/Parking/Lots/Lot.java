@@ -19,6 +19,15 @@ public class Lot {
     private int nStudentSpaces;
     private int nVisitorSpaces;
 
+    // how many spaces in each section are currently taken
+    // +1 in parkVehicle() when a car parks, -1 in removeOutgoing() when a car leaves
+    // isFull() compares these to the section sizes above instead of looping
+    private int filledHandicap = 0;
+    private int filledFaculty = 0;
+    private int filledService = 0;
+    private int filledStudent = 0;
+    private int filledVisitor = 0;
+
     private Queue<Vehicle> incoming;
     private Queue<Vehicle> outgoing;
 
@@ -157,7 +166,21 @@ public class Lot {
             for (int vIdx=0; vIdx<lotList.size(); vIdx++) {
                 
                 if (lotList.get(vIdx).getFilledBy()==v) {
-                    
+
+                    // lower the counter for the section this car was actually parked in
+                    Space oldSpace = lotList.get(vIdx);
+                    if (oldSpace instanceof HandicapSpace) {
+                        filledHandicap--;
+                    } else if (oldSpace instanceof FacultySpace) {
+                        filledFaculty--;
+                    } else if (oldSpace instanceof ServiceSpace) {
+                        filledService--;
+                    } else if (oldSpace instanceof StudentSpace) {
+                        filledStudent--;
+                    } else if (oldSpace instanceof VisitorSpace) {
+                        filledVisitor--;
+                    }
+
                     if (v.isHandicapped()) {
 
                         lotList.set(vIdx,new HandicapSpace());
@@ -200,8 +223,10 @@ public class Lot {
                 ArrayList<Space> handicapLot = getHandicapSpaces();
                 for (int spaceIdx=0; spaceIdx<handicapLot.size(); spaceIdx++) {
                     if (handicapLot.get(spaceIdx).getFilledBy()==null) {
-                        handicapLot.get(spaceIdx).parkVehicle(v);
-                        return true;
+                        if (handicapLot.get(spaceIdx).parkVehicle(v)) {
+                            filledHandicap++;
+                            return true;
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -220,8 +245,10 @@ public class Lot {
                     ArrayList<Space> studentLot = getStudentSpaces();
                     for (int spaceIdx=0; spaceIdx<studentLot.size(); spaceIdx++) {
                         if (studentLot.get(spaceIdx).getFilledBy()==null) {
-                            studentLot.get(spaceIdx).parkVehicle(v);
-                            return true;
+                            if (studentLot.get(spaceIdx).parkVehicle(v)) {
+                                filledStudent++;
+                                return true;
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -236,8 +263,10 @@ public class Lot {
                     ArrayList<Space> facultyLot = getFacultySpaces();
                     for (int spaceIdx=0; spaceIdx<facultyLot.size(); spaceIdx++) {
                         if (facultyLot.get(spaceIdx).getFilledBy()==null) {
-                            facultyLot.get(spaceIdx).parkVehicle(v);
-                            return true;
+                            if (facultyLot.get(spaceIdx).parkVehicle(v)) {
+                                filledFaculty++;
+                                return true;
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -252,8 +281,10 @@ public class Lot {
                     ArrayList<Space> serviceLot = getServiceSpaces();
                     for (int spaceIdx=0; spaceIdx<serviceLot.size(); spaceIdx++) {
                         if (serviceLot.get(spaceIdx).getFilledBy()==null) {
-                            serviceLot.get(spaceIdx).parkVehicle(v);
-                            return true;
+                            if (serviceLot.get(spaceIdx).parkVehicle(v)) {
+                                filledService++;
+                                return true;
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -268,8 +299,10 @@ public class Lot {
                     ArrayList<Space> visitorLot = getVisitorSpaces();
                     for (int spaceIdx=0; spaceIdx<visitorLot.size(); spaceIdx++) {
                         if (visitorLot.get(spaceIdx).getFilledBy()==null) {
-                            visitorLot.get(spaceIdx).parkVehicle(v);
-                            return true;
+                            if (visitorLot.get(spaceIdx).parkVehicle(v)) {
+                                filledVisitor++;
+                                return true;
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -285,5 +318,30 @@ public class Lot {
     }
         return false;
 }
+
+
+    // returns true if this lot has no open space in the section this vehicle belongs to
+    // handicapped vehicles use the handicap section, everyone else uses their designation's section
+    // O(1): compares a counter to the section size, no looping through spaces
+    public boolean isFull(Vehicle vehicle) {
+
+        // handicapped overrides designation, so turn both into one section name
+        String section = vehicle.isHandicapped() ? "handicap" : vehicle.getDesignation();
+
+        switch (section) {
+            case "handicap":
+                return filledHandicap >= nHandicapSpaces;
+            case "student":
+                return filledStudent >= nStudentSpaces;
+            case "faculty":
+                return filledFaculty >= nFacultySpaces;
+            case "service":
+                return filledService >= nServiceSpaces;
+            case "visitor":
+                return filledVisitor >= nVisitorSpaces;
+            default:
+                return true; // unknown designation: no section it can use
+        }
+    }
 
 }
