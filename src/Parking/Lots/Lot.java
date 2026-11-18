@@ -19,9 +19,7 @@ public class Lot {
     private int nStudentSpaces;
     private int nVisitorSpaces;
 
-    // how many spaces in each section are currently taken
-    // +1 in parkVehicle() when a car parks, -1 in removeOutgoing() when a car leaves
-    // isFull() compares these to the section sizes above instead of looping
+
     private int filledHandicap = 0;
     private int filledFaculty = 0;
     private int filledService = 0;
@@ -160,7 +158,7 @@ public class Lot {
 
     public String removeOutgoing() throws Exception {
         try {
-            Vehicle v = outgoing.peek();
+            Vehicle v = outgoing.poll();
             
             // remove vehicle from its old space (inefficient, someone else pls implement binary search or something)
             for (int vIdx=0; vIdx<lotList.size(); vIdx++) {
@@ -320,9 +318,7 @@ public class Lot {
 }
 
 
-    // returns true if this lot has no open space in the section this vehicle belongs to
-    // handicapped vehicles use the handicap section, everyone else uses their designation's section
-    // O(1): compares a counter to the section size, no looping through spaces
+
     public boolean isFull(Vehicle vehicle) {
 
         // handicapped overrides designation, so turn both into one section name
@@ -348,7 +344,7 @@ public class Lot {
         String searchPlate = vehicle.getLicencePlate();
         String found = "Vehicle has not been found.";
         for(int i = 0; i<lotList.size(); i++) {
-            if(lotList.get(i).isFull = true) {
+            if(lotList.get(i).getFilledBy() != null) {
                 String testPlate = lotList.get(i).getFilledBy().getLicencePlate();
                 if(searchPlate.equals(testPlate)) {
                     found = "Vehicle found in space " + i;
