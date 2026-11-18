@@ -139,21 +139,58 @@ public class Lot {
     }
 
     // poll and return vehicle type
-    public String removeIncoming() {
-        Vehicle v = incoming.peek();
-        parkVehicle(incoming.poll());
-        return v.getDesignation();
+    public String removeIncoming() throws Exception {
+        try {
+            Vehicle v = incoming.peek();
+            parkVehicle(incoming.poll());
+            return v.getDesignation();
+        } catch (Exception e) {
+            throw new Exception("warning: empty incoming queue!!!");
+        }
     }
 
-    public String removeOutgoing() {
-        Vehicle v = outgoing.peek();
-        // remove vehicle from its old space (inefficient, someone else pls implement binary search or something)
-        for (int vIdx=0; vIdx<lotList.size(); vIdx++) {
-            if (lotList.get(vIdx).getFilledBy()==v) {
-                lotList.set(vIdx, new Space());
+    public String removeOutgoing() throws Exception {
+        try {
+            Vehicle v = outgoing.peek();
+            
+            // remove vehicle from its old space (inefficient, someone else pls implement binary search or something)
+            for (int vIdx=0; vIdx<lotList.size(); vIdx++) {
+                
+                if (lotList.get(vIdx).getFilledBy()==v) {
+                    
+                    if (v.isHandicapped()) {
+
+                        lotList.set(vIdx,new HandicapSpace());
+
+                    } else {
+
+                        String desig = v.getDesignation();
+                        switch (desig) {
+                            case "student":
+                                lotList.set(vIdx, new StudentSpace());
+                                break;
+                            case "faculty":
+                                lotList.set(vIdx, new FacultySpace());
+                                break;
+                            case "service":
+                                lotList.set(vIdx, new ServiceSpace());
+                                break;
+                            case "visitor":
+                                lotList.set(vIdx, new VisitorSpace());
+                                break;
+                            default:
+                                lotList.set(vIdx, new Space());
+
+                        }
+
+                    }
+                    
+                }
             }
+            return v.getDesignation();
+        } catch (Exception e) {
+            throw new Exception("warning: empty outgoing queue!!!");
         }
-        return v.getDesignation();
     }
 
     public boolean parkVehicle(Vehicle v) {
