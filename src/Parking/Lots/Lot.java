@@ -344,4 +344,18 @@ public class Lot {
         }
     }
 
+    public String searchByPlate(Vehicle vehicle) {
+        String searchPlate = vehicle.getLicencePlate();
+        String found = "Vehicle has not been found.";
+        for(int i = 0; i<lotList.size(); i++) {
+            if(lotList.get(i).isFull = true) {
+                String testPlate = lotList.get(i).getFilledBy().getLicencePlate();
+                if(searchPlate.equals(testPlate)) {
+                    found = "Vehicle found in space " + i;
+                }
+            }
+        }
+        return found;
+    }
+
 }
