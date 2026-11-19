@@ -8,7 +8,7 @@ public class ServiceSpace extends Space {
 
     @Override
     public boolean parkVehicle(Vehicle vehicle) {
-        if (vehicle.getDesignation() != "service" || isFull) {
+        if (!"service".equals(vehicle.getDesignation()) || isFull) {
             return false;
         } else {
             this.isFull = true;

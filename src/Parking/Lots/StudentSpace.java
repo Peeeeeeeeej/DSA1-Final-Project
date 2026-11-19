@@ -8,7 +8,7 @@ public class StudentSpace extends Space {
 
     @Override
     public boolean parkVehicle(Vehicle vehicle) {
-        if (vehicle.getDesignation() != "student" || isFull) {
+        if (!"student".equals(vehicle.getDesignation()) || isFull) {
             return false;
         } else {
             this.isFull = true;

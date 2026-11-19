@@ -269,3 +269,33 @@ The program's entry point. It creates all of the vehicles and lots, then writes 
 4. `vehicles.csv` and `lots.csv` appear in the project root folder. If they don't show up, right-click the project and choose **Reload from Disk**.
 
 Each run generates new random data and overwrites the old CSV files.
+
+## Website (parking map GUI)
+
+A browser GUI for the parking system. The Java code runs as a small local web server, and the page in `web/` draws the campus map and sends every action to it.
+
+1. In IntelliJ, open `src/Parking/server/ParkingServer.java` and click the green run arrow next to `main`.
+2. The console prints `Parking website running. Open http://localhost:8080 in your browser.`
+3. Open http://localhost:8080. Stop the server with the red square in IntelliJ before running it again.
+
+| File | Purpose |
+|------|---------|
+| `Parking.server.ParkingServer` | Starts the web server (Java's built-in `HttpServer`, no libraries) and serves `web/` |
+| `Parking.server.ParkingSystem` | The 8 lots (100, 80, 70, 60, 60, 50, 40, 40 spaces) and the park, leave, search and Dev rules |
+| `web/index.html`, `styles.css`, `app.js` | The map, hover popups, park form, Dev tab and light/dark mode |
+
+Parking rules on the website:
+- A car parks in its designation's section of the lot it was clicked on, then overflows into that lot's general spaces.
+- If the lot is full for that car, the page suggests other lots with room.
+- A handicapped car uses handicap spaces. If they're full, the user chooses another space in the same lot or a different lot with open handicap spaces.
+- Plates are 6 characters (A-Z, 0-9) and unique. A blank plate gets a random one.
+- The Dev tab adds random cars with the project's random rules, each placed in a random lot with room.
+
+Other website features:
+- **Undo** (top bar) reverses the last park, leave, Dev batch or Dev departure. It's a stack, so it undoes the newest action first. Reset can't be undone.
+- **Park me anywhere** sends the car to the lot with the most room for it.
+- The lot popup draws every space, colored by section and filled when taken.
+- The park form remembers your last vehicle type, designation and checkboxes.
+- Leaving a car asks for confirmation first.
+- The page checks the server every 3 seconds, so several open tabs stay in sync.
+- The **Dev** tab has campus stats (parked and turned away per group), an occupancy-over-time chart, preset buttons, number boxes next to the sliders, and random departures that go through each lot's outgoing queue.

@@ -8,7 +8,7 @@ public class VisitorSpace extends Space {
 
     @Override
     public boolean parkVehicle(Vehicle vehicle) {
-        if (vehicle.getDesignation() != "visitor" || isFull) {
+        if (!"visitor".equals(vehicle.getDesignation()) || isFull) {
             return false;
         } else {
             this.isFull = true;

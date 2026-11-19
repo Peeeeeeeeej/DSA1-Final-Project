@@ -26,6 +26,10 @@ public class Lot {
     private int filledStudent = 0;
     private int filledVisitor = 0;
 
+    // general spaces: the left-over spaces any vehicle can use as overflow
+    private int nGeneralSpaces;
+    private int filledGeneral = 0;
+
     private Queue<Vehicle> incoming;
     private Queue<Vehicle> outgoing;
 
@@ -44,6 +48,7 @@ public class Lot {
         this.nStudentSpaces = (int) Math.floor((double) sizeInit * 0.45); // was 0.60 before EV and handicap
         this.nVisitorSpaces = (int) Math.floor((double) sizeInit * 0.10);
         this.nHandicapSpaces = (int) Math.floor((double) sizeInit * 0.05);
+        this.nGeneralSpaces = size - (nFacultySpaces + nServiceSpaces + nStudentSpaces + nVisitorSpaces + nHandicapSpaces);
 
         // account for left-over spaces from truncation of ceiling function
         for (int spaceIdx = 0; spaceIdx < (size
@@ -177,35 +182,26 @@ public class Lot {
                         filledStudent--;
                     } else if (oldSpace instanceof VisitorSpace) {
                         filledVisitor--;
-                    }
-
-                    if (v.isHandicapped()) {
-
-                        lotList.set(vIdx,new HandicapSpace());
-
                     } else {
-
-                        String desig = v.getDesignation();
-                        switch (desig) {
-                            case "student":
-                                lotList.set(vIdx, new StudentSpace());
-                                break;
-                            case "faculty":
-                                lotList.set(vIdx, new FacultySpace());
-                                break;
-                            case "service":
-                                lotList.set(vIdx, new ServiceSpace());
-                                break;
-                            case "visitor":
-                                lotList.set(vIdx, new VisitorSpace());
-                                break;
-                            default:
-                                lotList.set(vIdx, new Space());
-
-                        }
-
+                        filledGeneral--;
                     }
-                    
+
+                    // replace it with an empty space of the SAME type it was
+                    // (a student leaving a general space must leave a general space behind)
+                    if (oldSpace instanceof HandicapSpace) {
+                        lotList.set(vIdx, new HandicapSpace());
+                    } else if (oldSpace instanceof FacultySpace) {
+                        lotList.set(vIdx, new FacultySpace());
+                    } else if (oldSpace instanceof ServiceSpace) {
+                        lotList.set(vIdx, new ServiceSpace());
+                    } else if (oldSpace instanceof StudentSpace) {
+                        lotList.set(vIdx, new StudentSpace());
+                    } else if (oldSpace instanceof VisitorSpace) {
+                        lotList.set(vIdx, new VisitorSpace());
+                    } else {
+                        lotList.set(vIdx, new Space());
+                    }
+                    break; // plates are unique, so stop once the car is found
                 }
             }
             return v.getDesignation();
@@ -352,6 +348,85 @@ public class Lot {
             }
         }
         return found;
+    }
+
+    // ---------- methods used by the website (Parking.server) ----------
+
+    // general spaces are plain Space objects (not one of the subclasses)
+    public ArrayList<Space> getGeneralSpaces() {
+        ArrayList<Space> generalSpaces = new ArrayList<Space>();
+        for (int spaceIdx = 0; spaceIdx < size; spaceIdx++) {
+            if (lotList.get(spaceIdx).getClass() == Space.class) {
+                generalSpaces.add(lotList.get(spaceIdx));
+            }
+        }
+        return generalSpaces;
+    }
+
+    // which section a space belongs to
+    public static String sectionOf(Space space) {
+        if (space instanceof HandicapSpace) return "handicap";
+        if (space instanceof FacultySpace) return "faculty";
+        if (space instanceof ServiceSpace) return "service";
+        if (space instanceof StudentSpace) return "student";
+        if (space instanceof VisitorSpace) return "visitor";
+        return "general";
+    }
+
+    // open spots left in a section, O(1) using the counters
+    public int openSpaces(String section) {
+        switch (section) {
+            case "handicap": return nHandicapSpaces - filledHandicap;
+            case "student":  return nStudentSpaces - filledStudent;
+            case "faculty":  return nFacultySpaces - filledFaculty;
+            case "service":  return nServiceSpaces - filledService;
+            case "visitor":  return nVisitorSpaces - filledVisitor;
+            case "general":  return nGeneralSpaces - filledGeneral;
+            default:         return 0;
+        }
+    }
+
+    public int totalSpaces(String section) {
+        switch (section) {
+            case "handicap": return nHandicapSpaces;
+            case "student":  return nStudentSpaces;
+            case "faculty":  return nFacultySpaces;
+            case "service":  return nServiceSpaces;
+            case "visitor":  return nVisitorSpaces;
+            case "general":  return nGeneralSpaces;
+            default:         return 0;
+        }
+    }
+
+    public boolean isSectionFull(String section) {
+        return openSpaces(section) <= 0;
+    }
+
+    // parks the vehicle in a specific section of this lot
+    // returns the space number it parked in, or -1 if that section had no space for it
+    public int parkInSection(Vehicle v, String section) {
+        if (isSectionFull(section)) {
+            return -1;
+        }
+        for (int spaceIdx = 0; spaceIdx < lotList.size(); spaceIdx++) {
+            Space space = lotList.get(spaceIdx);
+            if (space.getFilledBy() == null && sectionOf(space).equals(section) && space.parkVehicle(v)) {
+                switch (section) {
+                    case "handicap": filledHandicap++; break;
+                    case "student":  filledStudent++;  break;
+                    case "faculty":  filledFaculty++;  break;
+                    case "service":  filledService++;  break;
+                    case "visitor":  filledVisitor++;  break;
+                    default:         filledGeneral++;
+                }
+                return spaceIdx;
+            }
+        }
+        return -1;
+    }
+
+    public int countParked() {
+        return filledHandicap + filledStudent + filledFaculty + filledService + filledVisitor + filledGeneral;
     }
 
 }
